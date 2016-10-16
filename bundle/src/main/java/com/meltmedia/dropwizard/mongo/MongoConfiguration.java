@@ -15,26 +15,12 @@
  */
 package com.meltmedia.dropwizard.mongo;
 
-import io.dropwizard.lifecycle.Managed;
-import io.dropwizard.setup.Environment;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.WriteConcern;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoConfiguration {
   public static Logger log = LoggerFactory.getLogger(MongoBundle.class);
@@ -46,6 +32,8 @@ public class MongoConfiguration {
   protected String database;
   protected String writeConcern = "ACKNOWLEDGED";
   protected boolean enabled = true;
+
+  protected Options options;
 
   public List<Server> getSeeds() {
     return seeds;
@@ -86,7 +74,15 @@ public class MongoConfiguration {
   public void setDatabase( String database ) {
     this.database = database;
   }
-  
+
+  public Options getOptions() {
+    return options;
+  }
+
+  public void setOptions(Options options) {
+    this.options = options;
+  }
+
   public static class Server {
     @NotNull
     protected String host;

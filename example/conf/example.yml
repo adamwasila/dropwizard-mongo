@@ -3,6 +3,9 @@ mongo:
   - host: "localhost"
     port: 27017
   database: "example"
+  options:
+    sslEnabled: false
+    sslInvalidHostNameAllowed: false
   credentials:
     userName: "example"
     password:

@@ -15,20 +15,6 @@
  */
 package com.meltmedia.dropwizard.mongo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import io.dropwizard.Configuration;
-import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.lifecycle.Managed;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.meltmedia.dropwizard.mongo.MongoConfiguration.Credentials;
 import com.meltmedia.dropwizard.mongo.MongoConfiguration.Server;
 import com.mongodb.DB;
@@ -37,6 +23,17 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+import io.dropwizard.Configuration;
+import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.lifecycle.Managed;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MongoBundle<C extends Configuration> implements ConfiguredBundle<C> {
   public static Logger log = LoggerFactory.getLogger(MongoBundle.class);
@@ -140,7 +137,18 @@ public class MongoBundle<C extends Configuration> implements ConfiguredBundle<C>
       }
 
       // build the options.
-      MongoClientOptions options = new MongoClientOptions.Builder().writeConcern(writeConcern(configuration.getWriteConcern())).build();
+      MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
+
+      Options configOptions = configuration.getOptions();
+
+      builder.writeConcern(writeConcern(configuration.getWriteConcern()));
+
+      if( configOptions != null ) {
+        builder.sslEnabled(asBooleanPrimitive(configOptions.getSslEnabled()));
+        builder.sslInvalidHostNameAllowed(asBooleanPrimitive(configOptions.getSslInvalidHostNameAllowed()));
+      }
+
+      MongoClientOptions options = builder.build();
 
       log.info("Mongo database is {}", configuration.getDatabase());
 
@@ -157,4 +165,9 @@ public class MongoBundle<C extends Configuration> implements ConfiguredBundle<C>
     }
     return writeConcern;
   }
+
+  private static boolean asBooleanPrimitive(Boolean value) {
+    return Boolean.TRUE.equals(value);
+  }
+
  }
